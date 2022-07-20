@@ -1,0 +1,73 @@
+> npm init -y
+> git init
+
+.gitignore -> /node_modules
+
+> npm i express cors sequelize mysql2 jsonwebtoken bcryptjs dotenv
+
+> sequelize init:config
+config/config.json -> database config
+> sequelize db:create
+
+* sequelize --help
+> sequelize migration:generate --name user
+migrations/20220719160240-user.js -> edit up, down function
+> sequelize db:migrate
+* sequelize db:migrate:undo
+
+> sequelize migration:generate --name post
+migrations/20220719163134-post.js -> edit up, down function
+> sequelize db:migrate
+
+Table Alternation Example
+https://sequelize.org/api/v6/class/src/dialects/abstract/query-interface.js~queryinterface
+> sequelize migration:generate --name alter-user
+migrations/20220720062725-alter-user.js -> edit up, down function
+> sequelize db:migrate
+> sequelize db:migrate:undo
+
+> sequelize migration:generate --name friend
+migrations/20220720070953-friends.js -> edit up, down function
+> sequelize db:migrate
+
+> sequelize migration:generate --name comment
+migrations/20220720084038-comments.js -> edit up, down function
+> sequelize db:migrate
+
+> sequelize migration:generate --name like
+migrations/20220720084559-like.js -> edit up, down function
+> sequelize db:migrate
+
+
+package.json -> "start": "nodemon app.js"
+app.js -> code server
+#const express = require("express");
+#const app = express();
+
+.env -> PORT
+#require("dotenv").config();
+#const post = process.env.PORT || 8000;
+#app.listen(port, () => console.log(`Fakebuck server started on port ${port}`));
+
+#const cors = require("cors");
+#app.use(cors());
+
+#app.use(express.json());
+#app.use(express.urlencoded({extended: false}))
+
+middlewares/notfound.js
+middlewares/error.js
+#const notFoundMiddleware = require("./middlewares/notfound");
+#const errorMiddleware = require("./middlewares/error");
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
+
+> npm i -D morgan
+#const morgan = required("morgan");
+#process.env.NODE_ENV === "DEVELOPMENT" ?? app.use(morgan("dev"));
+.env -> NODE_ENV=DEVELOPMENT
+
+.gitignore ->   .env
+                config.json
+
+First commit

@@ -1,0 +1,168 @@
+POST        /auth/login
+BODY        emailOrPhone    required
+            password        required
+RESPONSE    200 token       {token: xxxxxxxxxxxxxxxx}
+            400 message     {message: invalid credential}
+            500 message     {message: internal server error}
+
+
+POST        /auth/signup
+BODY        firstName       required
+            lastName        required
+            emailOrPhone    required
+            password        required, length >=6
+            confirmPassword match password
+RESPONSE    200 token       {token: xxxxxxxxxxxxxxxx}
+            400 message     {message: error message}
+            500 message     {message: internal server error}
+
+GET         /user/me
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    200 user        {user: {
+                                    id,
+                                    firstName,
+                                    lastName,
+                                    email,
+                                    phoneNumber,
+                                    profileImage,
+                                    coverImage
+                                    friends: [
+                                                {id,
+                                                firstName,
+                                                lastName,
+                                                profileImage},
+                                             ]
+                                    }
+                            }
+            401 message     {message: you are unauthorized}
+            500 message     {message: internal server error}
+
+PATCH       /user
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        profileImage OR       
+            coverImage      required
+RESPONSE    200 url         {profileImage: https//pic.com/xxxxx} OR
+                            {coverImage: https//pic.com/xxxxx}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            500 message     {message: internal server error}
+
+
+POST        /posts
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        message OR image    required
+RESPONSE    200 post        {post: {id, message, image, likeCount, createAt, updatedAt}}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            500 message     {message: internal server error}
+
+PATCH       /posts/:postId
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        message OR image    required
+RESPONSE    200 post        {post: {id, message, image, likeCount, createAt, updatedAt}}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+DELETE      /posts/:postId
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    204 No Content
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+
+POST        /posts/:postId/like
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    200 like        {like: {id, postId, userId, createAt, updatedAt}}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+DELETE      /post/:postId/like
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    204 No Content
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+
+GET         /users/posts
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    200 posts       {posts: [
+                                        {id, message, image, likeCount, createdAt
+                                         user: {id, firstName, lastName, profileImage},
+                                         comments: [
+                                            {id, message, createAt,
+                                            user: {id, firstName, lastName, profileImage}
+                                            }
+                                         ]
+                                        }
+                                    ]
+                            }
+
+
+POST        /comments
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        message         required
+RESPONSE    200 comment     {comment: {id, message, createAt, updatedAt}}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            500 message     {message: internal server error}
+
+PATCH       /comments/:commentId
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        message         required
+RESPONSE    200 comment     {comment: {id, message, createAt, updatedAt}}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+DELETE      /comments/:commentId
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    204 No Content
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+
+GET         /friends
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+QUERY       status e.g. ACCEPTED, PENDING, UNKNOWN
+RESPONSE    200 users       {users: [{id, firstName, lastName, ...except password, friendId}]}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+PATCH       /friends/:friendId
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        status          required
+RESPONSE    200 message     {message}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+POST        /friends
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+BODY        toUserId        required
+RESPONSE    200 friend      {friend: FriendObject}
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}
+
+DELETE      /friends/:friendId
+HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
+RESPONSE    204 No Content
+            400 message     {message: error message}
+            401 message     {message: you are unauthorized}
+            403 message     {message: you have no permission}
+            500 message     {message: internal server error}

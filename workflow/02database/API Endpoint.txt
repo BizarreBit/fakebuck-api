@@ -1,0 +1,235 @@
+Features
+
+>Users
+- login
+- sign up
+- get a user profile
+- update profile image
+- update cover image
+
+>Friends
+- get friend list
+- get friend request list
+- add a friend request
+- confirm a friend request
+- delete a friend request / Unfriend
+
+>Posts
+- get post feeds
+- create/update/delete a post
+
+>Likes
+- like/unlike a post
+
+>Comments
+- get post's comments
+- create/update/delete a post's comment
+
+>COMBINATION
+- get friend suggestion list
+
+
+
+[Users]
+- login
+POST  /auth/login
+  >Parameters:
+    BODY: emailOrPhone (required),
+          password     (required)
+  >Response:
+    200:  token        {token: xxxxxxxxxxxxxxxx}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- sign up
+POST  /user/register
+  >Parameters:
+    BODY: firstName    (required),
+          lastName     (required),
+          emailOrPhone (required),
+          password     (required)
+  >Response:
+    201:  message      {message: new user registered}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- get a user profile
+GET /user/profile-image/:userid
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: userId (optional)
+  >Response:
+    200:  user         {user: {firtName, lastName, profileImage, coverImage}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- update profile image
+PATCH /user/profile-image
+  >Authorization: Bearer token
+  >Parameters:
+    BODY: profileImage (URL, required)
+  >Response:
+    200:  profileImage {profileImage: URL}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- update cover image
+PATCH /user/cover-image
+  >Authorization: Bearer token
+  >Parameters:
+    BODY: coverImage (URL, required)
+  >Response:
+    200:  profileImage {profileImage: URL}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+
+[Friends]
+- get friend list
+GET /friends
+  >Authorization: Bearer token
+  >Response:
+    200:  friends      {friends: [{userId, status},]}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- add a friend request
+POST /friends
+  >Authorization: Bearer token
+  >Parameters:
+    BODY: userId (required)
+  >Response:
+    201:  message      {friend: {userId, status: PENDING}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+  
+- confirm a friend request
+PATCH /friends/:userId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: userId (required)
+    BODY: status (required)
+  >Response:
+    200:  message      {friend: {userId, status: ACCEPTED}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- delete a friend request / Unfriend
+DELETE /friends/:userId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: userId (required)
+  >Response:
+    204:  No Content
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+
+[Posts]
+- get post feeds
+GET /posts
+  >Authorization: Bearer token
+  >Response:
+    204:  posts        {posts:[{postId, userId, message, image, updatedAt},]}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- create a post
+POST /posts
+  >Authorization: Bearer token
+  >Parameters:
+    BODY: message
+          image
+  >Response:
+    201:  post         {post:{postId, message, image}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- update a post
+PUT /posts/:postId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: postId (required)
+    BODY: message
+          image
+  >Response:
+    200:  post         {post:{postId, message, image}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- delete a post
+DELETE /posts/:postId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: postId (required)
+  >Response:
+    204:  No Content
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+
+[Likes]
+- like a post
+POST /likes/
+  >Authorization: Bearer token
+  >Parameters:
+    BODY: postId
+  >Response:
+    201:  
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- unlike a post
+DELETE /likes/:postId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: postId (required)
+  >Response:
+    204:  No Content
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+[Comments]
+- get post's comments
+GET /comments/:postId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS: postId (required)
+  >Response:
+    200:  comments     {comments: [{comment},]}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- create a post's comment
+POST /comments/:postId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS:  postId (required)
+    BODY:         message (required)
+  >Response:
+    201:  comment      {comment: {commentId, userId, postId, message}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- update a post's comment
+PUT /comments/:postId/:commentId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS:  postId (required)
+                  commentId
+    BODY:         message (required)
+  >Response:
+    201:  comment      {comment: {commentId, userId, postId, message}}
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
+
+- DELETE a post's comment
+DELETE /comments/:postId/:commentId
+  >Authorization: Bearer token
+  >Parameters:
+    PATH PARAMS:  postId (required)
+                  commentId
+  >Response:
+    204:  No Content
+    400:  message      {message: invalid credential}
+    500:  message      {message: internal server error}
