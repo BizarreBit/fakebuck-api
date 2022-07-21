@@ -16,7 +16,9 @@ module.exports = {
         type: Sequelize.DataTypes.STRING,
       },
       like_count: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+        defaultValue: 0,
       },
       user_id: {
         type: Sequelize.DataTypes.INTEGER,

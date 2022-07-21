@@ -1,0 +1,18 @@
+> sequelize init:models
+
+models/User.js
+models/Post.js
+
+> sequelize db:drop
+> sequelize db:create
+sync.js ->  #const { sequelize } = require("./models");
+            #sequelize.sync({ force: true });
+> node sync.js
+
+models/Friend.js
+models/Comment.js
+models/Like.js
+
+> node sync.js
+
+(associate)

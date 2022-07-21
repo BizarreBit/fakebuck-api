@@ -10,10 +10,11 @@ module.exports = {
         primaryKey: true,
       },
       status: {
-        type: Sequelize.DataTypes.ENUM('PENDING', 'ACCEPTED', 'DENIED'),
+        type: Sequelize.DataTypes.ENUM('PENDING', 'ACCEPTED'),
         allowNull: false,
+        defaultValue: "PENDING",
       },
-      fromUserId: {
+      from_user_id: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -23,7 +24,7 @@ module.exports = {
           key: "id"
         }
       },
-      toUserId: {
+      to_user_id: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
         references: {
