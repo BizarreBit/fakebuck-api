@@ -1,0 +1,121 @@
+routes/authRoute.js
+#const router = require("express").Router();
+#module.exports = router;
+
+#const authController = require("../controller/authController")
+#router.post("/login", authController.login);
+#router.post("/signup", authController.signup);
+
+controllers/authController.js -> (code according to API Endpoint Doc)
+#exports.login = async (req, res, next) => {
+  try {
+  } catch (err) {
+    next(err);
+  }
+};
+
+#exports.signup = async (req, res, next) => {
+  try {
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+(SIGNUP)
+#const { firstName, lastName, emailOrPhone, password, confirmPassword } =
+      req.body;
+
+utilities/createError.js -> (make a custom error throwing utility)
+
+#const createError = require("../utilities/createError");
+#if (!emailOrPhone) {
+    createError("an email or a phone number is required", 400);
+}
+#if (!password) {
+    createError("password is required", 400);
+}
+#if (password !== confirmPassword) {
+    createError("confirm password mismatch", 400);
+}
+#if (password.length < 8) {
+    createError(
+    "password length must be equal or greater than 8 characters",
+    400
+    );
+}
+
+> npm i validator
+#const validator = require("validator");
+#const isMobilePhone = validator.isMobilePhone(emailOrPhone + "");
+#const isEmail = validator.isEmail(emailOrPhone + "");
+#if (!isMobilePhone && !isEmail) {
+    createError("email or phone number is invalid format", 400);
+}
+
+#const bcrypt = require("bcryptjs");
+#const hashedPassword = await bcrypt.hash(password, 12);
+#const user = await Users.create({
+    firstName,
+    lastName,
+    phoneNumber: isMobilePhone ? emailOrPhone : null,
+    email: isEmail ? emailOrPhone : null,
+    password: hashedPassword,
+});
+
+.env -> JWT_SECRET_KEY
+#const jwt = require("jsonwebtoken");
+#const payload = {
+    id: user.id,
+};
+#const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+    expiresIn: "7d",
+});
+
+app.js ->   #const authRouter = require("./routes/authRoute");
+            #app.use("/auth", authRouter);
+
+npm start
+(test with postman)
+
+(LOGIN)
+#const { emailOrPhone, password } = req.body;
+#const { Op } = require("sequelize")
+#const user = await User.findOne({
+    where: {
+    [Op.or]: [{ phoneNumber: emailOrPhone }, { email: emailOrPhone }],
+    },
+});
+#if (!user) {
+    createError("invalid credential", 400);
+}
+
+#const isMatch = await bcrypt.compare(password, user.password);
+#if (!isMatch) {
+    createError("invalid credential", 400);
+}
+
+.env -> JWT_EXPIRES_IN=7d
+
+#const genToken = (payload) =>
+  jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+#const token = genToken({id: user.id})
+#res.status(201).json({ token });
+(test with postman)
+
+
+(GET me)
+controllers/userController.js
+routes/userRoute.js
+app.js
+
+middlewares/authenticate.js
+app.js
+
+controllers/userController.js
+middlewares/authenticate.js
+  #attributes: {
+    exclude: ["password"],
+  },
