@@ -5,6 +5,7 @@ const morgan = require("morgan");
 
 const authRouter = require("./routes/authRoute");
 const userRouter = require("./routes/userRoute");
+const friendRouter = require("./routes/friendRoute");
 const authenticate = require("./middlewares/authenticate");
 const notFoundMiddleware = require("./middlewares/notfound");
 const errorMiddleware = require("./middlewares/error");
@@ -19,7 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/auth", authRouter);
-app.use("/user", authenticate, userRouter);
+app.use("/users", authenticate, userRouter);
+app.use("/friends", authenticate, friendRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

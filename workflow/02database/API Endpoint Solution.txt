@@ -16,7 +16,7 @@ RESPONSE    200 token       {token: xxxxxxxxxxxxxxxx}
             400 message     {message: error message}
             500 message     {message: internal server error}
 
-GET         /user/me
+GET         /users/me
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
 RESPONSE    200 user        {user: {
                                     id,
@@ -37,7 +37,7 @@ RESPONSE    200 user        {user: {
             401 message     {message: you are unauthorized}
             500 message     {message: internal server error}
 
-PATCH       /user
+PATCH       /users
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
 BODY        profileImage OR       
             coverImage      required
@@ -141,9 +141,9 @@ RESPONSE    200 users       {users: [{id, firstName, lastName, ...except passwor
             403 message     {message: you have no permission}
             500 message     {message: internal server error}
 
-PATCH       /friends/:friendId
+PATCH       /friends/:fromUserId
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
-BODY        status          required
+//BODY        status          required
 RESPONSE    200 message     {message}
             400 message     {message: error message}
             401 message     {message: you are unauthorized}

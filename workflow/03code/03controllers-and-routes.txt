@@ -111,6 +111,7 @@ controllers/userController.js
 routes/userRoute.js
 app.js
 
+controllers/userController.js
 middlewares/authenticate.js
 app.js
 
@@ -119,3 +120,43 @@ middlewares/authenticate.js
   #attributes: {
     exclude: ["password"],
   },
+
+(Request friend)
+controllers/friendController.js
+routes/friendRoute.js
+app.js
+
+controllers/friendController.js
+config/constants.js
+models/Friend.js
+controllers/friendController.js
+
+(Accept friend, Delete friend)
+controllers/friendController.js
+routes/friendRoute.js
+
+controllers/friendController.js
+    (change API Doc PATCH :friendId to :fromUserId)
+PATCH       /friends/:fromUserId
+//BODY        status          required
+routes/friendRoute.js
+controllers/friendController.js
+(test with postman)
+
+(Get All friend)
+routes/friendRoute.js
+controllers/friendController.js -> getAllFriend 
+services/friendService.js -> findAcceptedFriend
+controllers/friendController.js
+
+controllers/friendController.js
+services/friendService.js -> findPendingFriend
+
+controllers/friendController.js
+services/friendService.js -> findRequestedFriend
+
+controllers/friendController.js
+services/friendService.js -> findUnknown
+
+controllers/friendController.js -> switch case
+(test with postman)

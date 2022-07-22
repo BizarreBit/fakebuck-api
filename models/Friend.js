@@ -1,11 +1,13 @@
+const { FRIEND_ACCEPTED, FRIEND_PENDING } = require("../config/constants");
+
 module.exports = (sequelize, DataTypes) => {
   const Friend = sequelize.define(
     "Friend",
     {
       status: {
-        type: DataTypes.ENUM("PENDING", "ACCEPTED"),
+        type: DataTypes.ENUM(FRIEND_PENDING, FRIEND_ACCEPTED),
         allowNull: false,
-        defaultValue: "PENDING",
+        defaultValue: FRIEND_PENDING,
       },
     },
     {
