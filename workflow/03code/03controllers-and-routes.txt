@@ -160,3 +160,194 @@ services/friendService.js -> findUnknown
 
 controllers/friendController.js -> switch case
 (test with postman)
+
+*****************(CC11 25-05-2022 1:10:18 save lost recovery)
+(Update Image)
+controllers/userController.js --> #exports.updateImage
+routes/userRoute.js --> #router.patch("/", userController.updateImage)
+
+  (Dealing with form-data using Multer)
+  > npm i multer
+
+  middlewares/upload.js -->
+  #const multer = require("multer");
+
+    (dest -- not much useful)
+  #module.exports = multer({ dest: "public/images" });
+  
+  public/images --> create new folder
+
+  routes/userRoute.js --> #upload.single("profileImage")
+  controllers/userController.js -->
+
+
+  controllers/userController.js --> #console.log(req.file);
+  { -- req.file
+    fieldname: 'profileImage',
+    originalname: 'cool-avatar-icons-59.png',
+    encoding: '7bit',
+    mimetype: 'image/png',
+    destination: 'public/images',
+    filename: '1658920439759.png',
+    path: 'public\\images\\1658920439759.png',
+    size: 43409
+  }
+
+    (storage -- more useful)
+    middlewares/upload.js -->
+    #const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        // console.log(file);
+        // cb("Error", "destination");  //node pattern "error-first callback style"
+        cb(null, "public/images");
+      },
+      filename: (req, file, cb) => {
+        cb(null, "1111");
+      },
+    });
+    #module.exports = multer({ storage });
+
+      (get and set file name and type)
+      #cb(null, new Date().getTime() + "." + file.mimetype.split("/")[1]);
+    
+  controllers/userController.js -->
+  #await User.update(
+    { profileImage: req.file.path },
+    { where: { id: req.user.id } }
+  );
+  #res.json({ profileImage: req.file.path });
+
+  (Using cloud server -- cloundinary)
+  https://cloudinary.com/documentation/node_quickstart
+  > npm i cloudinary
+  https://cloudinary.com/console/
+  .api --> CLOUDINARY_URL=cloudinary://
+
+    (import library)
+  controllers/userController.js -->
+  #const cloudinary = require("cloudinary").v2;
+
+      (callback form)
+    #cloudinary.uploader.upload(req.file.path, async (error, result) => {
+      if (error) {
+        return next(error)
+    }
+
+        (sample result)
+      https://cloudinary.com/documentation/image_upload_api_reference#upload_response
+      
+    #await User.update(
+      { profileImage: result.secure_url },
+      { where: { id: req.user.id } }
+    );
+    #res.status(200).json({ profileImage: result.secure_url });
+
+      (remove temp image file)
+    const fs = require("fs");
+    rs.unlinkSync(req.file.path)
+
+      (promise form)
+    utilities/cloudinary.js --> #const util = require("util");
+    #const cloudinary = require("cloudinary").v2;
+    #exports.upload = util.promisify(cloudinary.uploader.upload);
+
+    controllers/userController.js -->
+    #const cloudinary = require("../utilities/cloudinary");
+    #if (!req.file) {
+      createError("profileImage is required", 400)
+    }
+    #const result = await cloudinary.upload(req.file.path);
+    #await User.update(
+      { profileImage: result.secure_url },
+      { where: { id: req.user.id } }
+    );
+    #fs.unlinkSync(req.file.path);
+    #    res.status(200).json({ profileImage: result.secure_url });
+
+      (multiple fields) 
+      upload.single --> upload.fields
+      req.file      --> req.files
+    #router.patch(
+      "/",
+      upload.fields([
+        { name: "profileImage", maxCount: 1 },
+        { name: "coverImage", maxCount: 1 },
+      ]),
+      userController.updateImage
+    );
+
+    [Object: null prototype] {  -- req.files
+      profileImage: [
+        {
+          fieldname: 'profileImage',
+          originalname: 'cool-avatar-icons-59.png',
+          encoding: '7bit',
+          mimetype: 'image/png',
+          destination: 'public/images',
+          filename: '1658923744768.png',
+          path: 'public\\images\\1658923744768.png',
+          size: 43409
+        }
+      ],
+      coverImage: [
+        {
+          fieldname: 'coverImage',
+          originalname: 'Screenshot (1).png',
+          encoding: '7bit',
+          mimetype: 'image/png',
+          destination: 'public/images',
+          filename: '1658923744770.png',
+          path: 'public\\images\\1658923744770.png',
+          size: 420538
+        }
+      ]
+    }
+
+    #if (!req.files) {
+      createError("profileImage or coverImage is required", 400);
+    }
+    #if (req.files.profileImage) {
+      const result = await cloudinary.upload(req.files.profileImage[0].path);
+    }
+    if (req.files.coverImage) {
+      const result = await cloudinary.upload(req.files.coverImage[0].path);
+    }
+
+      (save to the database)
+    #const updateValue = {};
+      #updateValue.profileImage = result.secure_url;
+    #await User.update(updateValue, { where: { id: req.user.id } });
+
+      (send response)
+    #res.status(200).json(updateValue);
+
+      (remove temporary image file even an error occur)
+    #finally {
+      if (req.files.profileImage) {
+        fs.unlinkSync(req.files.profileImage[0].path);
+      }
+      if (req.files.coverImage) {
+        fs.unlinkSync(req.files.coverImage[0].path);
+      }
+    }
+
+      (remove unused previous image file on cloud)
+    https://cloudinary.com/documentation/image_upload_api_reference#destroy
+        (destroy method)
+      utilities/cloudinary.js --> 
+      #exports.destroy = util.promisify(cloudinary.uploader.destroy);
+
+        (check if null, split to get public_id , destroy)
+      if (req.user.profileImage) {
+        const splited = req.user.profileImage.split("/");
+        const publicId = splited[splited.length - 1].split(".")[0];
+        await cloudinary.destroy(publicId)
+      }
+
+*****************(CC11 25-05-2022 1:10:18 save lost recovery)
+
+      (temporary image file name collision bug fix)
+    > npm i uuid
+    middlewares/upload.js -->
+    #const { v4: uuidv4 } = require("uuid");
+    #cb(null, uuidv4() + "." + file.mimetype.split("/")[1]);
