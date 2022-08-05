@@ -51,7 +51,7 @@ RESPONSE    200 url         {profileImage: https//pic.com/xxxxx} OR
 POST        /posts
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
 BODY        message OR image    required
-RESPONSE    200 post        {post: {id, message, image, likeCount, createAt, updatedAt}}
+RESPONSE    201 post        {post: {id, message, image, likeCount, createAt, updatedAt}}
             400 message     {message: error message}
             401 message     {message: you are unauthorized}
             500 message     {message: internal server error}

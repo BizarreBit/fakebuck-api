@@ -351,3 +351,64 @@ routes/userRoute.js --> #router.patch("/", userController.updateImage)
     middlewares/upload.js -->
     #const { v4: uuidv4 } = require("uuid");
     #cb(null, uuidv4() + "." + file.mimetype.split("/")[1]);
+
+
+(Create Post)
+controllers/postController.js --> #exports.createPost async
+routes/postRoute.js --> #router.post("/", postController.createPost);
+app.js --> #app.use("/posts", authenticate, postRouter);
+
+routes/postRoute.js --> #upload.single("image")
+controllers/postController.js -->
+#finally {
+    if (req.files.image) {
+      fs.unlinkSync(req.files.image[0].path);
+    }
+  }
+
+#const { message } = req.body;
+#if (typeof message !== "string" && !req.file) {
+  createError("a message or an image is required", 400);
+}
+#if (req.file) {
+  var { secure_url: image } = await cloudinary.upload(req.file.path);
+}
+#const post = await Post.create({
+  message,
+  image,
+  userId: req.user.id,
+});
+#res.status(200).json({ post });
+
+(Edit Post)
+(Delete Post)
+
+(Like Post)
+    (transaction) prevent corrupt data due to an error in database instruction set 
+        SQL1  Delete  \
+        SQL2  Create    } transaction
+        SQL3  Update  /
+        ถ้า all success จึงค่อย commit database
+        ถ้า one fail    ให้ rollback
+        https://sequelize.org/docs/v6/other-topics/transactions/
+          (Unmanaged transaction)(mannal start, specify transaction, commit, rollback)
+            // First, we start a transaction and save it into a variable
+            const t = await sequelize.transaction();
+
+            controllers/postController.js --> 
+              #const { Post, Like, sequelize } = require("../models");
+              #const t = await sequelize.transaction();
+
+              #const like = await Like.create(
+                {
+                  postId: id, //foreignKey constrain
+                  userId: req.user.id,
+                },
+                { transaction: t }
+              );
+              #await post.increment({ likeCount: 1 }, { transaction: t });
+              #await t.commit();
+
+              #await t.rollback();
+
+(Unlike Post)
