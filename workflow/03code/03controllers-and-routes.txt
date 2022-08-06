@@ -412,3 +412,18 @@ controllers/postController.js -->
               #await t.rollback();
 
 (Unlike Post)
+
+
+
+(Comment)
+controllers/commentController.js --> new file
+routes/postRoute.js -->
+  #const commentRoute = require("./routes/commentRoute")
+  #router.post("/:postId/comments", commentController.createComment);
+  #router.patch("/:postId/comments/:id", commentController.editComment);
+  #router.delete("/:postId/comments/:id", commentController.deleteComment);
+
+  (Create Comment)
+    controllers/commentController.js
+  (Edit Comment)
+  (Delete Comment)

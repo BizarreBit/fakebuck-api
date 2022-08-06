@@ -106,7 +106,7 @@ RESPONSE    200 posts       {posts: [
                             }
 
 
-POST        /comments
+POST        /post/:postId/comments
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
 BODY        message         required
 RESPONSE    200 comment     {comment: {id, message, createAt, updatedAt}}
@@ -114,7 +114,7 @@ RESPONSE    200 comment     {comment: {id, message, createAt, updatedAt}}
             401 message     {message: you are unauthorized}
             500 message     {message: internal server error}
 
-PATCH       /comments/:commentId
+PATCH       /post/:postId/comments/:commentId
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
 BODY        message         required
 RESPONSE    200 comment     {comment: {id, message, createAt, updatedAt}}
@@ -123,7 +123,7 @@ RESPONSE    200 comment     {comment: {id, message, createAt, updatedAt}}
             403 message     {message: you have no permission}
             500 message     {message: internal server error}
 
-DELETE      /comments/:commentId
+DELETE      /post/:postId/comments/:commentId
 HEADER      Authorization   Bearer xxxxxxxxxxxxxxxx
 RESPONSE    204 No Content
             400 message     {message: error message}
