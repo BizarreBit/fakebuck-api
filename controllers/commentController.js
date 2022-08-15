@@ -6,10 +6,10 @@ exports.createComment = async (req, res, next) => {
     const { postId } = req.params;
     const { message } = req.body;
 
-    // const post = await Post.findOne({ where: { id: postId } });
-    // if (!post) {
-    //   createError("the post is not exist or deleted", 400);
-    // }
+    const post = await Post.findOne({ where: { id: postId } });
+    if (!post) {
+      createError("the post is not exist or deleted", 400);
+    }
 
     const comment = await Comment.create({
       message,
@@ -28,10 +28,10 @@ exports.editComment = async (req, res, next) => {
     const { id, postId } = req.params;
     const { message } = req.body;
 
-    // const post = await Post.findOne({ where: { id: postId } });
-    // if (!post) {
-    //   createError("the post is not exist or deleted", 400);
-    // }
+    const post = await Post.findOne({ where: { id: postId } });
+    if (!post) {
+      createError("the post is not exist or deleted", 400);
+    }
 
     // const comment = await Comment.findOne({
     //   where: {

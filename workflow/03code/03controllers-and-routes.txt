@@ -427,3 +427,54 @@ routes/postRoute.js -->
     controllers/commentController.js
   (Edit Comment)
   (Delete Comment)
+
+< [Lost Video Recap by TA P'V]
+      (error message)
+      middlewares/error.js --> 
+
+      <พี่ วี>
+      <ทำไมใน practice จริง เราจะแยกเอาลอจิกต่างๆออกจาก constroller เป็น service แยก ----- restful api -- service layer>
+
+      (friendService)
+
+      (Get User Post) - (with transaction)
+      controllers/postController.js --> getUserPost
+      routes/postRoute.js --> #const postController = require("../controllers/postController");
+                              #router.get("/posts", postController.getUserPost);
+
+        (multiple eager loading)
+
+      (Edit Post) - (with transaction)
+
+      (Delete Post) - (with transaction)
+        -- restrict foreignKey -- destroy comment like post
+>
+
+(Post) - (with transaction)
+routes/userRoute.js -->
+  #const postController = require("../controllers/postController");
+  #router.get("/posts", postController.getUserPost)
+controllers/postController.js --> 
+  (Edit Post)
+    #if (post.userId !== req.user.id) {
+      createError("you have no permission", 403);
+    }
+  (Delete Post)
+    (destroy Comment, Like, Post -- with transaction)
+
+  (Get User Post)
+    (Find Friend Ids)
+      services/friendService.js --> findFriendId
+    (eager loading)
+      https://sequelize.org/docs/v6/advanced-association-concepts/eager-loading/#multiple-eager-loading
+      controllers/postController.js --> getUserPost
+
+(Error Handling Mesage and Code)
+  models/Comment.js -->
+  #validate: {
+    notEmpty: {
+      msg: "message must not empty"
+    }
+  },
+
+  middlewares/error.js --> err.message, err.statusCode

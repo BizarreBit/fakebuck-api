@@ -2,7 +2,8 @@ const fs = require("fs");
 
 const cloudinary = require("../utilities/cloudinary");
 const createError = require("../utilities/createError");
-const { Post, Like, sequelize } = require("../models");
+const { Post, Like, Comment, User, sequelize } = require("../models");
+const FriendService = require("../services/friendService");
 
 exports.createPost = async (req, res, next) => {
   try {
@@ -43,11 +44,13 @@ exports.editPost = async (req, res, next) => {
       createError("a message or an image is required", 400);
     }
 
-    const post = await Post.findOne({
-      where: { id, userId: req.user.id },
-    });
+    const post = await Post.findOne({ where: { id } });
     if (!post) {
       createError("post not found", 400);
+    }
+
+    if (post.userId !== req.user.id) {
+      createError("you have no permission", 403);
     }
 
     if (message) {
@@ -72,20 +75,29 @@ exports.editPost = async (req, res, next) => {
 };
 
 exports.deletePost = async (req, res, next) => {
+  const t = await sequelize.transaction();
   try {
     const { id } = req.params;
 
-    const post = await Post.findOne({
-      where: { id, userId: req.user.id },
-    });
+    const post = await Post.findOne({ where: { id } });
     if (!post) {
       createError("post not found", 400);
     }
 
-    await post.destroy();
+    if (post.userId !== req.user.id) {
+      createError("you have no permission", 403);
+    }
+
+    await Comment.destroy({ where: { postId: id } }, { transaction: t });
+    await Like.destroy({ where: { postId: id } }, { transaction: t });
+    await cloudinary.destroyByUrl(post.image);
+    await post.destroy({ transaction: t });
+
+    await t.commit();
 
     res.status(204).json();
   } catch (err) {
+    await t.rollback();
     next(err);
   }
 };
@@ -166,6 +178,39 @@ exports.unlikePost = async (req, res, next) => {
     res.status(204).json();
   } catch (err) {
     await t.rollback();
+    next(err);
+  }
+};
+
+exports.getUserPost = async (req, res, next) => {
+  try {
+    const userId = await FriendService.findFriendId(req.user.id);
+    userId.push(req.user.id);
+
+    const posts = await Post.findAll({
+      where: { userId },
+      attributes: {
+        exclude: ["userId", "createdAt"],
+      },
+      include: [
+        {
+          model: User,
+          attributes: ["id", "firstName", "lastName", "profileImage"],
+        },
+        {
+          model: Comment,
+          attributes: {
+            exclude: ["userId", "createdAt"],
+          },
+          include: {
+            model: User,
+            attributes: ["id", "firstName", "lastName", "profileImage"],
+          },
+        },
+      ],
+    });
+    res.status(200).json({ posts });
+  } catch (err) {
     next(err);
   }
 };

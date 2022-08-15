@@ -6,12 +6,8 @@ const { FRIEND_ACCEPTED, FRIEND_PENDING } = require("../config/constants");
 exports.findAcceptedFriend = async (id) => {
   const friends = await Friend.findAll({
     where: {
-      [Op.and]: [
-        {
-          [Op.or]: [{ fromUserId: id }, { toUserId: id }],
-        },
-        { status: FRIEND_ACCEPTED },
-      ],
+      [Op.or]: [{ fromUserId: id }, { toUserId: id }],
+      status: FRIEND_ACCEPTED,
     },
   });
   // console.log(JSON.stringify(friends, null, 2));
@@ -69,19 +65,32 @@ exports.findUnknown = async (id) => {
     },
   });
 
-  const knownIds = friends.map((el) =>
+  const friendIds = friends.map((el) =>
     el.fromUserId === id ? el.toUserId : el.fromUserId
   );
 
-
-  knownIds.push(id)
+  friendIds.push(id);
 
   const users = await User.findAll({
-    where: { 
-      id: {[Op.notIn]: knownIds}
-     },
+    where: {
+      id: { [Op.notIn]: friendIds },
+    },
     attributes: { exclude: ["password"] },
   });
 
   return users;
+};
+
+exports.findFriendId = async (id) => {
+  const friends = await Friend.findAll({
+    where: {
+      [Op.or]: [{ fromUserId: id }, { toUserId: id }],
+      status: FRIEND_ACCEPTED,
+    },
+  });
+
+  const friendIds = friends.map((el) =>
+    el.fromUserId === id ? el.toUserId : el.fromUserId
+  );
+  return friendIds;
 };
